@@ -4,8 +4,7 @@ Fallen tree-bridge
 Tool and API for interconnecting digital forensic treegraph modules with digital forensic framework implementations.
 
 
-Fallen tree bridge API
-======================
+__**Fallen tree bridge API**__
 
 The fallen-tree-bridge API is a forensic treegraph decomposition API inspired by the Open Computer Forensics Architecture (OCFA) treegraph API.
 While OCFA is an architecture aimed primaraly at relatively large scale computer forensic investigations, and while OCFA aimed primarily at 
@@ -24,19 +23,17 @@ computer forensic frameworks for addressing different scale end intensity levels
 of 'framework as a module'. That is, both fallen-tree-bridge compatible treegraph modules and fallen-tree-bridge compatible framework connectors
 are implemented as runtime loadable shared libraries.
 
-FTB treegraph modules
-=====================
+__**FTB treegraph modules**__
 
 More info will follow.
 
-Header only approach for frameworks
-===================================
+__**Header only approach for frameworks**__
+
 
 More info will follow.
 
 
-Embedding approach for frameworks
-=================================
+__**Embedding approach for frameworks**__
 
 More info will follow.
 
