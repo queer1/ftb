@@ -51,13 +51,14 @@ namespace ftb {
   class AbstractParentData {
     public:
       virtual off_t size()=0; //The full size of the entity.
-      virtual operator std::istream()=0; //Get as a C++ input stream. 
+      virtual operator std::istream &()=0; //Get as a C++ input stream. 
       virtual operator std::string()=0; //Get the local path for calling 3th party libs or tools. 
                                         //Using the path rather than the istream may incur additional 
                                         //overhead in a distributed system. 
-      virtual ssize_t read(off_t offset,void *buf, size_t count); //Random access to a piece of data. 
+      virtual ssize_t read(off_t offset,void *buf, size_t count)=0; //Random access to a piece of data. 
                                                                   //Using random access rather than sequential
                                                                   //may incur additional overhead in a distributed system.
+      virtual std::string sha1()=0;
       virtual ~AbstractParentData(){}
   };
   //The interface for setting meta-data for the node.
@@ -134,10 +135,6 @@ namespace ftb {
   //The base interface for ftb modules. 
   //The AbstractModule functor has 5 arguments:
   //  * parentData : Interface to the content of the parent node.
-  //  * parentSha1 : Functor that returns the hex representation of the SHA1 hash of the parent node. 
-  //                 Please note that involing this function may result in the whole parent entity getting read head to tail
-  //                 for calculating the hash if the hash happened to no be already determined previously. 
-  //                 Thus invoking this functor could have severe performance penalties.
   //  * parentMetaData : An operator overloaded object for adding meta-data. This is a write only interface to parent meta-data.
   //                     Experience with OCFA has shown that hashes has shown that generic modules don't require read access
   //                     to meta-data.  
@@ -149,10 +146,9 @@ namespace ftb {
   class AbstractModule {
     public:
       virtual void operator()(AbstractParentData &parentData,
-                                     std::function<std::string()>  &parentSha1,
-                                     AbstractNodeMeta &parentMetaData,
-                                     std::function<std::string(off_t )> &getWorkdir,
-                                     AbstractSubnodeProcessor &processChild)=0;
+                              AbstractNodeMeta &parentMetaData,
+                              std::function<std::string(off_t )> &getWorkdir,
+                              AbstractSubnodeProcessor &processChild)=0;
       virtual ~AbstractModule(){}
   };
 
@@ -160,19 +156,20 @@ namespace ftb {
   //Prior to invoking the AbstractFramework, modules should first be registered with the framework.
   class AbstractFramework;
   class AbstractFramework {
+     public:
      //Helper class for the operator[] based assignments.
      class ModulesKey {
          std::string mKey;
          AbstractFramework *mFramework;
        public:
          ModulesKey(std::string key, AbstractFramework *fw):mKey(key),mFramework(fw){}
-         ModulesKey& operator =(AbstractModule const &module) {
+         ModulesKey& operator =(AbstractModule &module) {
             mFramework->registerModule(mKey,module);
             return *this;
          }        
      };
      //Method for regisering a module to the framework. 
-     virtual void registerModule(std::string modname,AbstractModule const &module)=0;
+     virtual void registerModule(std::string modname,AbstractModule &module)=0;
      virtual int operator()(int argc,char **argv)=0;
      ModulesKey operator[](std::string modname) {
          return ModulesKey(modname,this);
