@@ -27,7 +27,7 @@ class DemoParentData: public ftb::AbstractParentData {
     }
     std::string sha1(){
        if (mHash == "") {
-          mHash="BUGUS";
+          mHash="da39a3ee5e6b4b0d3255bfef95601890afd80709";
        }
        return mHash;
     }
